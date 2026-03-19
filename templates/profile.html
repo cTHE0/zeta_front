@@ -1,0 +1,274 @@
+{% extends "base.html" %}
+{% block extra_style %}
+.profile-layout {
+  max-width: 720px;
+  margin: 0 auto;
+  padding-top: var(--nav-h);
+}
+
+.profile-banner {
+  height: 180px;
+  background: linear-gradient(135deg, #FF3B5C22, #7B2FFF33, #00C9A722);
+  position: relative;
+  overflow: hidden;
+}
+
+.profile-banner::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%237B2FFF' fill-opacity='0.06'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+}
+
+.profile-info-section {
+  padding: 0 24px 24px;
+  border-bottom: 1px solid var(--border);
+  position: relative;
+}
+
+.profile-avatar-wrap {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  margin-top: -36px;
+  margin-bottom: 16px;
+}
+
+.profile-avatar-big {
+  width: 88px; height: 88px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--teal), var(--purple));
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--font-display);
+  font-size: 28px;
+  font-weight: 800;
+  border: 4px solid var(--bg);
+  position: relative;
+}
+
+.profile-edit-btn {
+  padding: 9px 24px;
+  border-radius: 40px;
+  border: 1px solid var(--border);
+  background: var(--glass);
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  margin-bottom: 4px;
+}
+
+.profile-edit-btn:hover { background: var(--bg3); }
+
+.profile-name {
+  font-family: var(--font-display);
+  font-size: 22px;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 4px;
+}
+
+.profile-handle {
+  color: var(--muted);
+  font-size: 14px;
+  margin-bottom: 12px;
+}
+
+.profile-bio {
+  font-size: 15px;
+  line-height: 1.6;
+  margin-bottom: 14px;
+  max-width: 500px;
+}
+
+.profile-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  font-size: 13px;
+  color: var(--muted);
+  margin-bottom: 16px;
+}
+
+.profile-meta span { display: flex; align-items: center; gap: 6px; }
+
+.profile-stats {
+  display: flex;
+  gap: 24px;
+  font-size: 14px;
+}
+
+.profile-stat strong {
+  font-weight: 700;
+  color: var(--text);
+  margin-right: 4px;
+}
+
+.profile-stat { color: var(--muted); cursor: pointer; }
+.profile-stat:hover { color: var(--text); }
+
+.profile-tabs {
+  display: flex;
+  border-bottom: 1px solid var(--border);
+}
+
+.profile-tab {
+  padding: 14px 24px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--muted);
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  transition: all 0.2s;
+}
+
+.profile-tab.active {
+  color: var(--text);
+  border-bottom-color: var(--red);
+}
+
+.identity-card {
+  margin: 24px;
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 20px;
+}
+
+.identity-row {
+  display: flex;
+  align-items: center;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--border);
+  gap: 12px;
+  font-size: 13px;
+}
+
+.identity-row:last-child { border-bottom: none; }
+
+.identity-key {
+  color: var(--muted);
+  min-width: 110px;
+  font-weight: 500;
+}
+
+.identity-val {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--text);
+  word-break: break-all;
+  flex: 1;
+}
+{% endblock %}
+
+{% block body %}
+<div class="profile-layout">
+
+  <div class="profile-banner"></div>
+
+  <div class="profile-info-section">
+    <div class="profile-avatar-wrap">
+      <div class="profile-avatar-big">AP</div>
+      <button class="profile-edit-btn">✏️ Modifier</button>
+    </div>
+
+    <div class="profile-name">
+      alice_phantom
+      <span class="verified-badge" style="width:20px;height:20px;font-size:11px;">✓</span>
+    </div>
+    <div class="profile-handle">@alice_phantom · <span style="font-family:var(--font-mono); font-size:11px; color:var(--teal);">🔑 f44c9b01</span></div>
+    <div class="profile-bio">Nœud actif du réseau Zeta Network 🔐 · Bitcoin maximaliste · Je construis des alternatives à la surveillance numérique · FullCone NAT</div>
+
+    <div class="profile-meta">
+      <span>🌍 Lyon, France</span>
+      <span>📅 Rejoint mars 2025</span>
+      <span>₿ <span style="color:var(--gold); font-family:var(--font-mono); font-size:11px;">1BvBM…VN2</span></span>
+    </div>
+
+    <div class="profile-stats">
+      <div class="profile-stat"><strong>247</strong> Posts</div>
+      <div class="profile-stat"><strong>12.4K</strong> Abonnés</div>
+      <div class="profile-stat"><strong>341</strong> Abonnements</div>
+      <div class="profile-stat"><strong>12 450</strong> sats reçus</div>
+    </div>
+  </div>
+
+  <div class="profile-tabs">
+    <div class="profile-tab active">Posts</div>
+    <div class="profile-tab">Réponses</div>
+    <div class="profile-tab">Identité</div>
+    <div class="profile-tab">Wallet</div>
+  </div>
+
+  <!-- Posts -->
+  <div id="tab-posts">
+    {% for post in posts %}
+    <div class="post-card" style="padding: 20px 24px; border-bottom: 1px solid var(--border);">
+      <div class="post-content" style="font-size:15px; line-height:1.65; margin-bottom:12px;">
+        {{ post.content }}
+        <div class="post-tags" style="margin-top:8px; display:flex; flex-wrap:wrap; gap:6px;">
+          {% for tag in post.tags %}
+          <span class="tag">{{ tag }}</span>
+          {% endfor %}
+        </div>
+      </div>
+      <div style="display:flex; gap:16px; font-size:13px; color:var(--muted);">
+        <span>{{ post.time }}</span>
+        <span>❤️ {{ "{:,}".format(post.likes).replace(",", " ") }}</span>
+        <span>💬 {{ post.comments }}</span>
+        <span>🔁 {{ post.reposts }}</span>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+
+  <!-- Identity card (hidden, shown on tab click) -->
+  <div id="tab-identity" style="display:none;">
+    <div class="identity-card">
+      <div style="font-family: var(--font-display); font-size:15px; font-weight:700; margin-bottom:16px;">🔐 Identité cryptographique</div>
+      <div class="identity-row">
+        <div class="identity-key">Peer ID</div>
+        <div class="identity-val">alice_phantom</div>
+      </div>
+      <div class="identity-row">
+        <div class="identity-key">Fingerprint</div>
+        <div class="identity-val" style="color:var(--teal);">f44c9b01e3a9d2c8</div>
+      </div>
+      <div class="identity-row">
+        <div class="identity-key">Clé publique</div>
+        <div class="identity-val">ed25519:a3b1f9d2c8e04f71…</div>
+      </div>
+      <div class="identity-row">
+        <div class="identity-key">Adresse BTC</div>
+        <div class="identity-val" style="color:var(--gold);">1BvBMSEYstWetqTFn5Au4m4GFg7xJaNVN2</div>
+      </div>
+      <div class="identity-row">
+        <div class="identity-key">Type NAT</div>
+        <div class="identity-val" style="color:var(--teal);">FullCone (excellent)</div>
+      </div>
+      <div class="identity-row">
+        <div class="identity-key">Port UDP</div>
+        <div class="identity-val">54321</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+{% endblock %}
+
+{% block extra_script %}
+const tabs = document.querySelectorAll('.profile-tab');
+tabs.forEach((tab, i) => {
+  tab.addEventListener('click', function() {
+    tabs.forEach(t => t.classList.remove('active'));
+    this.classList.add('active');
+    // Toggle content
+    document.getElementById('tab-posts').style.display = (i === 0) ? 'block' : 'none';
+    document.getElementById('tab-identity').style.display = (i === 2) ? 'block' : 'none';
+  });
+});
+{% endblock %}

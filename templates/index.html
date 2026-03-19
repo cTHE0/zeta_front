@@ -1,0 +1,354 @@
+{% extends "base.html" %}
+{% block body %}
+
+<div class="main-layout">
+
+  <!-- SIDEBAR LEFT -->
+  <aside class="sidebar-left">
+
+    <div class="sidebar-section">
+      <ul class="sidebar-menu">
+        <li><a href="/" class="active">
+          <span class="menu-icon">🏠</span> Accueil
+          <span class="badge">12</span>
+        </a></li>
+        <li><a href="/explore">
+          <span class="menu-icon">🔍</span> Explorer
+        </a></li>
+        <li><a href="#">
+          <span class="menu-icon">🔔</span> Notifications
+          <span class="badge">3</span>
+        </a></li>
+        <li><a href="#">
+          <span class="menu-icon">💬</span> Messages
+          <span class="badge">7</span>
+        </a></li>
+        <li><a href="/wallet">
+          <span class="menu-icon">💰</span> Wallet
+        </a></li>
+        <li><a href="/network">
+          <span class="menu-icon">🌐</span> Réseau P2P
+        </a></li>
+        <li><a href="/profile">
+          <span class="menu-icon">👤</span> Profil
+        </a></li>
+        <li><a href="#">
+          <span class="menu-icon">⚙️</span> Paramètres
+        </a></li>
+      </ul>
+    </div>
+
+    <a href="#" class="compose-btn">
+      <span>✦</span> Nouveau post
+    </a>
+
+    <div class="sidebar-section" style="margin-top: 24px;">
+      <div class="sidebar-label">Mon nœud</div>
+      <div class="node-card">
+        <div class="node-status">
+          <div class="status-dot"></div>
+          <span style="font-size: 12px; color: var(--teal); font-weight: 600;">Connecté</span>
+        </div>
+        <div class="node-id" style="margin-bottom: 12px; word-break: break-all;">
+          🔑 a3f8c1d2…9e4b
+        </div>
+        <div class="node-stats">
+          <div class="node-stat">
+            <div class="node-stat-val">847</div>
+            <div class="node-stat-lbl">Nœuds</div>
+          </div>
+          <div class="node-stat">
+            <div class="node-stat-val">23</div>
+            <div class="node-stat-lbl">Relays</div>
+          </div>
+          <div class="node-stat">
+            <div class="node-stat-val">42ms</div>
+            <div class="node-stat-lbl">Latence</div>
+          </div>
+          <div class="node-stat">
+            <div class="node-stat-val" style="color: var(--teal);">↑↓</div>
+            <div class="node-stat-lbl">Actif</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </aside>
+
+  <!-- FEED -->
+  <main class="feed">
+
+    <div class="feed-header">
+      <div class="feed-title">Pour vous</div>
+      <div class="feed-tabs">
+        <div class="feed-tab active">Tendances</div>
+        <div class="feed-tab">Abonnements</div>
+        <div class="feed-tab">Récents</div>
+        <div class="feed-tab">Local</div>
+      </div>
+    </div>
+
+    <!-- Stories -->
+    <div class="stories-bar">
+      {% for story in stories %}
+      <div class="story-item">
+        <div class="story-ring {{ 'has-story' if story.active else '' }}">
+          <div class="story-avatar" style="background: {{ story.avatar_color }}22; color: {{ story.avatar_color }};">
+            {{ story.avatar }}
+          </div>
+          {% if story.is_self %}
+          <div class="story-add">+</div>
+          {% endif %}
+        </div>
+        <div class="story-name">{{ story.user }}</div>
+      </div>
+      {% endfor %}
+    </div>
+
+    <!-- Compose area -->
+    <div class="compose-area">
+      <div class="post-avatar" style="background: linear-gradient(135deg, #FF3B5C22, #7B2FFF22); color: #FF3B5C; width:44px; height:44px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:13px; font-weight:700; flex-shrink:0;">Moi</div>
+      <div class="compose-input-wrap">
+        <textarea class="compose-input" placeholder="Quoi de neuf sur le réseau ? #P2P"></textarea>
+        <div class="compose-actions">
+          <div class="compose-tools">
+            <button class="compose-tool" title="Image">🖼️</button>
+            <button class="compose-tool" title="Payer">⚡</button>
+            <button class="compose-tool" title="Chiffrer">🔐</button>
+            <button class="compose-tool" title="Tag">🏷️</button>
+          </div>
+          <button class="post-btn">Publier</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Posts -->
+    {% for post in posts %}
+    <div class="post-card">
+      <div class="post-header">
+        <div class="post-avatar" style="background: {{ post.avatar_color }}22; color: {{ post.avatar_color }};">
+          {{ post.avatar }}
+        </div>
+        <div class="post-meta">
+          <div class="post-username">
+            {{ post.user }}
+            {% if post.verified %}
+            <span class="verified-badge">✓</span>
+            {% endif %}
+          </div>
+          <div class="post-fp">🔑 {{ post.fingerprint }}</div>
+        </div>
+        <div class="post-time">{{ post.time }}</div>
+      </div>
+
+      <div class="post-content">
+        {{ post.content }}
+        <div class="post-tags">
+          {% for tag in post.tags %}
+          <span class="tag">{{ tag }}</span>
+          {% endfor %}
+        </div>
+      </div>
+
+      {% if post.media == 'network' %}
+      <div class="post-media">
+        <div class="media-network">
+          <svg class="network-viz" viewBox="0 0 600 200" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <radialGradient id="glow" cx="50%" cy="50%" r="50%">
+                <stop offset="0%" stop-color="#7B2FFF" stop-opacity="0.3"/>
+                <stop offset="100%" stop-color="#7B2FFF" stop-opacity="0"/>
+              </radialGradient>
+            </defs>
+            <!-- Connections -->
+            <line x1="100" y1="100" x2="200" y2="60" stroke="#FF3B5C" stroke-width="1" stroke-opacity="0.4"/>
+            <line x1="100" y1="100" x2="180" y2="140" stroke="#7B2FFF" stroke-width="1" stroke-opacity="0.4"/>
+            <line x1="200" y1="60" x2="300" y2="100" stroke="#00C9A7" stroke-width="1" stroke-opacity="0.4"/>
+            <line x1="180" y1="140" x2="300" y2="100" stroke="#FF6B35" stroke-width="1" stroke-opacity="0.4"/>
+            <line x1="300" y1="100" x2="400" y2="60" stroke="#7B2FFF" stroke-width="1" stroke-opacity="0.4"/>
+            <line x1="300" y1="100" x2="420" y2="140" stroke="#FF3B5C" stroke-width="1" stroke-opacity="0.4"/>
+            <line x1="400" y1="60" x2="500" y2="100" stroke="#00C9A7" stroke-width="1" stroke-opacity="0.4"/>
+            <line x1="420" y1="140" x2="500" y2="100" stroke="#F7B731" stroke-width="1" stroke-opacity="0.4"/>
+            <line x1="200" y1="60" x2="180" y2="140" stroke="#00C9A7" stroke-width="1" stroke-opacity="0.3"/>
+            <line x1="400" y1="60" x2="420" y2="140" stroke="#FF6B35" stroke-width="1" stroke-opacity="0.3"/>
+            <!-- Nodes -->
+            <circle cx="100" cy="100" r="10" fill="#FF3B5C" fill-opacity="0.9"/>
+            <circle cx="100" cy="100" r="18" fill="#FF3B5C" fill-opacity="0.1"/>
+            <circle cx="200" cy="60" r="7" fill="#7B2FFF" fill-opacity="0.9"/>
+            <circle cx="180" cy="140" r="6" fill="#00C9A7" fill-opacity="0.9"/>
+            <circle cx="300" cy="100" r="12" fill="#7B2FFF" fill-opacity="0.9"/>
+            <circle cx="300" cy="100" r="22" fill="#7B2FFF" fill-opacity="0.1"/>
+            <circle cx="400" cy="60" r="8" fill="#FF6B35" fill-opacity="0.9"/>
+            <circle cx="420" cy="140" r="6" fill="#00C9A7" fill-opacity="0.9"/>
+            <circle cx="500" cy="100" r="10" fill="#F7B731" fill-opacity="0.9"/>
+            <circle cx="500" cy="100" r="18" fill="#F7B731" fill-opacity="0.1"/>
+            <!-- Labels -->
+            <text x="100" y="122" text-anchor="middle" fill="#FF3B5C" font-size="9" font-family="monospace">relay:alpha</text>
+            <text x="300" y="124" text-anchor="middle" fill="#7B2FFF" font-size="9" font-family="monospace">relay:beta</text>
+            <text x="500" y="122" text-anchor="middle" fill="#F7B731" font-size="9" font-family="monospace">relay:gamma</text>
+          </svg>
+        </div>
+      </div>
+      {% elif post.media == 'stats' %}
+      <div class="post-media">
+        <div class="media-stats">
+          <div class="stat-block">
+            <div class="stat-big">847</div>
+            <div class="stat-label">Nœuds actifs</div>
+          </div>
+          <div class="stat-block">
+            <div class="stat-big">23</div>
+            <div class="stat-label">Relays</div>
+          </div>
+          <div class="stat-block">
+            <div class="stat-big">42ms</div>
+            <div class="stat-label">Latence moy.</div>
+          </div>
+        </div>
+      </div>
+      {% elif post.media == 'code' %}
+      <div class="post-media">
+        <div class="media-code">
+<span style="color:#7B2FFF">pub fn</span> <span style="color:#F7B731">fingerprint</span><span style="color:#00C9A7">(public_key: &amp;[u8])</span> -&gt; String {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;public_key.iter()<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;.take(<span style="color:#FF6B35">8</span>)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;.map(|b| <span style="color:#FF3B5C">format!</span>(<span style="color:#00C9A7">"{:02x}"</span>, b))<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;.collect()<br>
+}
+        </div>
+      </div>
+      {% endif %}
+
+      {% if post.btc %}
+      <div style="display:flex; align-items:center; gap:8px; padding: 8px 12px; background: rgba(247,183,49,0.08); border-radius: 10px; margin-bottom: 12px; border: 1px solid rgba(247,183,49,0.2);">
+        <span style="font-size:14px;">₿</span>
+        <span style="font-family: var(--font-mono); font-size: 11px; color: var(--gold);">{{ post.btc[:16] }}…</span>
+        <button style="margin-left:auto; padding: 4px 12px; border-radius: 20px; border: 1px solid var(--gold); background: none; color: var(--gold); font-size: 11px; font-weight: 600; cursor: pointer; font-family: var(--font-body);" onclick="this.textContent='✓ Copié!'">Copier</button>
+      </div>
+      {% endif %}
+
+      <div class="post-actions">
+        <button class="action-btn like" data-liked="false">
+          <span class="action-icon">🤍</span>
+          <span class="action-count">{{ "{:,}".format(post.likes).replace(",", " ") }}</span>
+        </button>
+        <button class="action-btn comment">
+          <span class="action-icon">💬</span>
+          <span class="action-count">{{ post.comments }}</span>
+        </button>
+        <button class="action-btn repost">
+          <span class="action-icon">🔁</span>
+          <span class="action-count">{{ post.reposts }}</span>
+        </button>
+        <button class="action-btn send">
+          <span class="action-icon">⚡</span>
+          <span>Payer</span>
+        </button>
+      </div>
+    </div>
+    {% endfor %}
+
+    <!-- Load more -->
+    <div style="padding: 32px 24px; text-align: center;">
+      <button onclick="this.textContent = '⟳ Chargement…'" style="padding: 12px 32px; border-radius: 40px; border: 1px solid var(--border); background: var(--glass); color: var(--muted); font-family: var(--font-body); font-size: 14px; cursor: pointer;">
+        Charger plus
+      </button>
+    </div>
+
+  </main>
+
+  <!-- SIDEBAR RIGHT -->
+  <aside class="sidebar-right">
+
+    <!-- Wallet -->
+    <div class="widget">
+      <div class="widget-title">₿ Mon Wallet</div>
+      <div class="btc-balance">12 450 <span style="font-size:14px; color:var(--muted);">sats</span></div>
+      <div class="btc-sub" style="margin-bottom:12px;">≈ 5,23 €</div>
+      <div class="btc-address-card">
+        <div class="btc-label">Adresse Bitcoin</div>
+        <div class="btc-addr">1A2B3C4D5E6F7G8H9I0J</div>
+      </div>
+      <a href="/wallet" style="display:block; text-align:center; margin-top:12px; color:var(--gold); font-size:13px; font-weight:600; text-decoration:none;">Voir le wallet →</a>
+    </div>
+
+    <!-- Trending -->
+    <div class="widget">
+      <div class="widget-title">🔥 Tendances</div>
+      {% for t in trending %}
+      <div class="trend-item">
+        <div>
+          <div class="trend-rank">#{{ loop.index }} · Technologie</div>
+          <div class="trend-tag">{{ t.tag }}</div>
+          <div class="trend-count">{{ t.posts }} posts</div>
+        </div>
+        <span style="color:var(--muted);">›</span>
+      </div>
+      {% endfor %}
+    </div>
+
+    <!-- Suggested users -->
+    <div class="widget">
+      <div class="widget-title">✦ Suggérés</div>
+      <div class="suggest-item">
+        <div class="suggest-avatar" style="background: rgba(123,47,255,0.2); color: #7B2FFF;">NX</div>
+        <div class="suggest-info">
+          <div class="suggest-name">nexus_node</div>
+          <div class="suggest-fp">🔑 c2f91a…</div>
+        </div>
+        <button class="follow-btn">Suivre</button>
+      </div>
+      <div class="suggest-item">
+        <div class="suggest-avatar" style="background: rgba(0,201,167,0.2); color: #00C9A7;">PR</div>
+        <div class="suggest-info">
+          <div class="suggest-name">proto_relay</div>
+          <div class="suggest-fp">🔑 5d82bc…</div>
+        </div>
+        <button class="follow-btn">Suivre</button>
+      </div>
+      <div class="suggest-item">
+        <div class="suggest-avatar" style="background: rgba(255,107,53,0.2); color: #FF6B35;">DK</div>
+        <div class="suggest-info">
+          <div class="suggest-name">darknet_kai</div>
+          <div class="suggest-fp">🔑 8e3f11…</div>
+        </div>
+        <button class="follow-btn">Suivre</button>
+      </div>
+    </div>
+
+    <div style="font-size:11px; color: var(--muted); line-height: 1.8; padding: 0 4px;">
+      <a href="#" style="color:inherit; text-decoration:none;">À propos</a> · 
+      <a href="#" style="color:inherit; text-decoration:none;">Confidentialité</a> · 
+      <a href="#" style="color:inherit; text-decoration:none;">Open Source</a><br>
+      Zeta Network v0.1.0 — Réseau P2P décentralisé
+    </div>
+  </aside>
+
+</div>
+
+{% endblock %}
+
+{% block extra_script %}
+// Tab switching
+document.querySelectorAll('.feed-tab').forEach(tab => {
+  tab.addEventListener('click', function() {
+    document.querySelectorAll('.feed-tab').forEach(t => t.classList.remove('active'));
+    this.classList.add('active');
+  });
+});
+
+// Follow button toggle
+document.querySelectorAll('.follow-btn').forEach(btn => {
+  btn.addEventListener('click', function() {
+    if (this.textContent === 'Suivre') {
+      this.textContent = 'Suivi ✓';
+      this.style.background = 'var(--red)';
+      this.style.color = 'white';
+    } else {
+      this.textContent = 'Suivre';
+      this.style.background = '';
+      this.style.color = '';
+    }
+  });
+});
+{% endblock %}

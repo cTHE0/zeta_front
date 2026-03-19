@@ -1,0 +1,292 @@
+{% extends "base.html" %}
+{% block extra_style %}
+.network-layout {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: calc(var(--nav-h) + 32px) 24px 60px;
+}
+
+.network-grid {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 24px;
+  margin-top: 32px;
+}
+
+.network-map-card {
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: 24px;
+  overflow: hidden;
+  position: relative;
+}
+
+.network-map-header {
+  padding: 20px 24px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.network-map-title {
+  font-family: var(--font-display);
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.map-canvas {
+  width: 100%;
+  height: 420px;
+  position: relative;
+  background: radial-gradient(ellipse at center, rgba(123,47,255,0.06) 0%, transparent 70%);
+}
+
+.stats-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.stat-card {
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 24px;
+}
+
+.stat-card-value {
+  font-family: var(--font-display);
+  font-size: 40px;
+  font-weight: 800;
+  letter-spacing: -2px;
+  line-height: 1;
+  margin-bottom: 4px;
+}
+
+.stat-card-label {
+  font-size: 13px;
+  color: var(--muted);
+  margin-bottom: 16px;
+}
+
+.stat-bar {
+  height: 4px;
+  background: var(--bg2);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.stat-bar-fill {
+  height: 100%;
+  border-radius: 2px;
+  animation: grow-bar 1.5s ease forwards;
+  transform-origin: left;
+}
+
+@keyframes grow-bar {
+  from { width: 0; }
+}
+
+.peer-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.peer-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  background: var(--bg2);
+  border-radius: 10px;
+  font-size: 13px;
+}
+
+.peer-dot {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.peer-id-mono {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--muted);
+  margin-left: auto;
+}
+
+.nat-badge {
+  font-size: 10px;
+  padding: 2px 8px;
+  border-radius: 20px;
+  font-weight: 600;
+  font-family: var(--font-mono);
+}
+
+.nat-full { background: rgba(0,201,167,0.15); color: var(--teal); }
+.nat-sym { background: rgba(255,107,53,0.15); color: var(--orange); }
+.nat-port { background: rgba(123,47,255,0.15); color: var(--purple); }
+{% endblock %}
+
+{% block body %}
+<div class="network-layout">
+  <div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:12px;">
+    <div>
+      <h1 style="font-family: var(--font-display); font-size: 28px; font-weight: 800; margin-bottom: 4px;">Topologie du réseau</h1>
+      <p style="color: var(--muted); font-size: 15px;">Visualisation en temps réel des nœuds P2P</p>
+    </div>
+    <div class="live-indicator" style="font-size:13px; padding: 8px 16px;">● 847 nœuds actifs</div>
+  </div>
+
+  <div class="network-grid">
+
+    <div class="network-map-card">
+      <div class="network-map-header">
+        <div class="network-map-title">🌐 Carte mondiale</div>
+        <div style="font-family: var(--font-mono); font-size: 11px; color: var(--muted);">Mise à jour : il y a 3s</div>
+      </div>
+      <div class="map-canvas">
+        <svg width="100%" height="100%" viewBox="0 0 700 420" xmlns="http://www.w3.org/2000/svg">
+          <!-- Background grid -->
+          <defs>
+            <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+              <path d="M 40 0 L 0 0 0 40" fill="none" stroke="rgba(255,255,255,0.03)" stroke-width="1"/>
+            </pattern>
+            <radialGradient id="nodeGlow1" cx="50%" cy="50%" r="50%">
+              <stop offset="0%" stop-color="#FF3B5C" stop-opacity="0.6"/>
+              <stop offset="100%" stop-color="#FF3B5C" stop-opacity="0"/>
+            </radialGradient>
+            <radialGradient id="nodeGlow2" cx="50%" cy="50%" r="50%">
+              <stop offset="0%" stop-color="#7B2FFF" stop-opacity="0.6"/>
+              <stop offset="100%" stop-color="#7B2FFF" stop-opacity="0"/>
+            </radialGradient>
+          </defs>
+          <rect width="700" height="420" fill="url(#grid)"/>
+
+          <!-- Connection lines (subtle) -->
+          <line x1="100" y1="100" x2="300" y2="180" stroke="#FF3B5C" stroke-width="1" stroke-opacity="0.25" stroke-dasharray="4,4"/>
+          <line x1="300" y1="180" x2="500" y2="80" stroke="#7B2FFF" stroke-width="1" stroke-opacity="0.25" stroke-dasharray="4,4"/>
+          <line x1="300" y1="180" x2="420" y2="300" stroke="#00C9A7" stroke-width="1" stroke-opacity="0.25" stroke-dasharray="4,4"/>
+          <line x1="100" y1="100" x2="200" y2="280" stroke="#FF6B35" stroke-width="1" stroke-opacity="0.25" stroke-dasharray="4,4"/>
+          <line x1="200" y1="280" x2="420" y2="300" stroke="#7B2FFF" stroke-width="1" stroke-opacity="0.25" stroke-dasharray="4,4"/>
+          <line x1="500" y1="80" x2="600" y2="200" stroke="#F7B731" stroke-width="1" stroke-opacity="0.25" stroke-dasharray="4,4"/>
+          <line x1="600" y1="200" x2="420" y2="300" stroke="#FF3B5C" stroke-width="1" stroke-opacity="0.25" stroke-dasharray="4,4"/>
+          <line x1="300" y1="180" x2="150" y2="340" stroke="#00C9A7" stroke-width="1" stroke-opacity="0.25" stroke-dasharray="4,4"/>
+          <line x1="150" y1="340" x2="420" y2="300" stroke="#FF6B35" stroke-width="1" stroke-opacity="0.15" stroke-dasharray="4,4"/>
+
+          <!-- Relay nodes (larger) -->
+          <!-- Relay Alpha -->
+          <circle cx="300" cy="180" r="40" fill="url(#nodeGlow1)" opacity="0.4"/>
+          <circle cx="300" cy="180" r="16" fill="#FF3B5C" opacity="0.9"/>
+          <circle cx="300" cy="180" r="16" fill="none" stroke="#FF3B5C" stroke-width="1" stroke-opacity="0.4"/>
+          <text x="300" y="210" text-anchor="middle" fill="#FF3B5C" font-size="10" font-family="monospace" font-weight="bold">relay:alpha</text>
+          <text x="300" y="222" text-anchor="middle" fill="rgba(255,59,92,0.6)" font-size="8" font-family="monospace">Paris, FR</text>
+
+          <!-- Relay Beta -->
+          <circle cx="500" cy="80" r="35" fill="url(#nodeGlow2)" opacity="0.4"/>
+          <circle cx="500" cy="80" r="14" fill="#7B2FFF" opacity="0.9"/>
+          <text x="500" y="108" text-anchor="middle" fill="#7B2FFF" font-size="10" font-family="monospace" font-weight="bold">relay:beta</text>
+          <text x="500" y="120" text-anchor="middle" fill="rgba(123,47,255,0.6)" font-size="8" font-family="monospace">Frankfurt, DE</text>
+
+          <!-- Relay Gamma -->
+          <circle cx="420" cy="300" r="35" fill="url(#nodeGlow2)" opacity="0.3"/>
+          <circle cx="420" cy="300" r="13" fill="#00C9A7" opacity="0.9"/>
+          <text x="420" y="328" text-anchor="middle" fill="#00C9A7" font-size="10" font-family="monospace" font-weight="bold">relay:gamma</text>
+          <text x="420" y="340" text-anchor="middle" fill="rgba(0,201,167,0.6)" font-size="8" font-family="monospace">Singapore, SG</text>
+
+          <!-- Client nodes (smaller) -->
+          <circle cx="100" cy="100" r="6" fill="#F7B731" opacity="0.9"/>
+          <circle cx="100" cy="100" r="12" fill="#F7B731" fill-opacity="0.1"/>
+          <text x="100" y="118" text-anchor="middle" fill="rgba(247,183,49,0.6)" font-size="8" font-family="monospace">Lyon</text>
+
+          <circle cx="200" cy="280" r="5" fill="#FF6B35" opacity="0.9"/>
+          <circle cx="200" cy="280" r="10" fill="#FF6B35" fill-opacity="0.1"/>
+
+          <circle cx="600" cy="200" r="6" fill="#FF3B5C" opacity="0.9"/>
+          <circle cx="600" cy="200" r="12" fill="#FF3B5C" fill-opacity="0.1"/>
+
+          <circle cx="150" cy="340" r="5" fill="#7B2FFF" opacity="0.9"/>
+          <circle cx="580" cy="350" r="5" fill="#00C9A7" opacity="0.9"/>
+          <circle cx="60" cy="220" r="4" fill="#F7B731" opacity="0.7"/>
+          <circle cx="640" cy="100" r="4" fill="#FF6B35" opacity="0.7"/>
+          <circle cx="350" cy="380" r="4" fill="#7B2FFF" opacity="0.7"/>
+
+          <!-- My node indicator -->
+          <circle cx="100" cy="100" r="20" fill="none" stroke="#F7B731" stroke-width="1" stroke-opacity="0.4" stroke-dasharray="3,3">
+            <animateTransform attributeName="transform" type="rotate" from="0 100 100" to="360 100 100" dur="8s" repeatCount="indefinite"/>
+          </circle>
+          <text x="100" y="80" text-anchor="middle" fill="#F7B731" font-size="9" font-family="monospace">Vous</text>
+        </svg>
+      </div>
+      <div style="padding: 16px 24px; border-top: 1px solid var(--border); display:flex; gap:20px; flex-wrap:wrap;">
+        <span style="font-size:12px; color:var(--muted);">🔴 Relay  🟡 Client  ⬜ Inactif</span>
+        <span style="font-family: var(--font-mono); font-size: 11px; color:var(--muted);">NAT: FullCone · Latence: 42ms</span>
+      </div>
+    </div>
+
+    <div class="stats-panel">
+
+      <div class="stat-card">
+        <div class="stat-card-value" style="color: var(--teal);">847</div>
+        <div class="stat-card-label">Nœuds actifs en ce moment</div>
+        <div class="stat-bar">
+          <div class="stat-bar-fill" style="width: 84%; background: var(--teal);"></div>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-card-value" style="color: var(--purple);">23</div>
+        <div class="stat-card-label">Relays opérationnels</div>
+        <div class="stat-bar">
+          <div class="stat-bar-fill" style="width: 60%; background: var(--purple);"></div>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-card-label">Peers connectés à vous</div>
+        <div class="peer-list">
+          <div class="peer-row">
+            <div class="peer-dot" style="background: var(--red);"></div>
+            <span style="font-size: 13px; font-weight: 600;">relay:alpha</span>
+            <span class="nat-badge nat-full">FullCone</span>
+            <span class="peer-id-mono">42ms</span>
+          </div>
+          <div class="peer-row">
+            <div class="peer-dot" style="background: var(--purple);"></div>
+            <span style="font-size: 13px; font-weight: 600;">relay:beta</span>
+            <span class="nat-badge nat-sym">Symmetric</span>
+            <span class="peer-id-mono">91ms</span>
+          </div>
+          <div class="peer-row">
+            <div class="peer-dot" style="background: var(--teal);"></div>
+            <span style="font-size: 13px; font-weight: 600;">cryptonova</span>
+            <span class="nat-badge nat-port">PortRes.</span>
+            <span class="peer-id-mono">67ms</span>
+          </div>
+          <div class="peer-row">
+            <div class="peer-dot" style="background: var(--gold);"></div>
+            <span style="font-size: 13px; font-weight: 600;">mesh_w.</span>
+            <span class="nat-badge nat-full">FullCone</span>
+            <span class="peer-id-mono">33ms</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-card-label">Mon nœud</div>
+        <div style="font-family: var(--font-mono); font-size: 12px; line-height: 2; color: var(--muted);">
+          <div><span style="color: var(--text);">ID :</span> alice_phantom</div>
+          <div><span style="color: var(--text);">FP :</span> <span style="color: var(--teal);">f44c9b01…</span></div>
+          <div><span style="color: var(--text);">NAT :</span> <span style="color: var(--teal);">FullCone</span></div>
+          <div><span style="color: var(--text);">IP  :</span> 92.168.x.x:54321</div>
+          <div><span style="color: var(--text);">BTC :</span> <span style="color: var(--gold);">1BvBM…VN2</span></div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+{% endblock %}
