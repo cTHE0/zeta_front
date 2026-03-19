@@ -124,5 +124,17 @@ def network():
 def profile():
     return render_template('profile.html', posts=MOCK_POSTS[:3])
 
+@app.route('/notifications')
+def notifications():
+    return render_template('notifications.html')
+
+@app.route('/messages')
+def messages():
+    return render_template('messages.html')
+
+@app.route('/settings')
+def settings():
+    return render_template('settings.html')
+
 if __name__ == '__main__':
     app.run(debug=True)

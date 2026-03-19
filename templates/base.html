@@ -891,7 +891,7 @@ body::before {
   transform: scale(1.02);
 }
 </style>
-{% block extra_style %}{% endblock %}
+<style>{% block extra_style %}{% endblock %}</style>
 </head>
 <body>
 
@@ -953,7 +953,160 @@ function formatNum(n) {
   if (n >= 1000) return (n/1000).toFixed(1) + 'K';
   return n.toString();
 }
+
+function copyBtc(btn, addr) {
+  btn.textContent = '✓ Copié !';
+  showToast('Adresse BTC copiée : ' + addr.slice(0,12) + '…', 'success');
+  setTimeout(() => btn.textContent = 'Copier', 2000);
+}
 </script>
+<script>
 {% block extra_script %}{% endblock %}
+</script>
+
+<!-- Toast notification system -->
+<div id="toast-container" style="position:fixed; bottom:32px; left:50%; transform:translateX(-50%); z-index:9000; display:flex; flex-direction:column; gap:10px; align-items:center; pointer-events:none;"></div>
+
+<!-- Compose modal -->
+<div id="compose-modal" style="display:none; position:fixed; inset:0; z-index:500; background:rgba(0,0,0,0.7); backdrop-filter:blur(8px); align-items:center; justify-content:center;">
+  <div style="background:var(--bg2); border:1px solid var(--border); border-radius:24px; padding:28px; width:90%; max-width:540px; animation:fadeInUp 0.25s ease;">
+    <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:20px;">
+      <span style="font-family:var(--font-display); font-size:18px; font-weight:700;">Nouveau post</span>
+      <button onclick="closeCompose()" style="background:none; border:none; color:var(--muted); font-size:22px; cursor:pointer; line-height:1;">×</button>
+    </div>
+    <textarea id="compose-text" placeholder="Quoi de neuf sur le réseau ? #ZetaNetwork" style="width:100%; min-height:120px; background:var(--bg3); border:1px solid var(--border); border-radius:var(--radius-sm); padding:14px; color:var(--text); font-family:var(--font-body); font-size:16px; resize:none; outline:none;"></textarea>
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-top:16px;">
+      <div style="display:flex; gap:8px; font-size:20px; color:var(--muted);">
+        <span style="cursor:pointer;" title="Image">🖼️</span>
+        <span style="cursor:pointer;" title="Payer">⚡</span>
+        <span style="cursor:pointer;" title="Chiffrer">🔐</span>
+      </div>
+      <button onclick="submitPost()" style="padding:10px 28px; border-radius:40px; background:linear-gradient(135deg,var(--red),var(--purple)); color:white; border:none; font-family:var(--font-body); font-size:15px; font-weight:600; cursor:pointer;">Publier</button>
+    </div>
+  </div>
+</div>
+
+<!-- Pay modal -->
+<div id="pay-modal" style="display:none; position:fixed; inset:0; z-index:500; background:rgba(0,0,0,0.7); backdrop-filter:blur(8px); align-items:center; justify-content:center;">
+  <div style="background:var(--bg2); border:1px solid var(--border); border-radius:24px; padding:28px; width:90%; max-width:420px; animation:fadeInUp 0.25s ease;">
+    <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:20px;">
+      <span style="font-family:var(--font-display); font-size:18px; font-weight:700;">⚡ Envoyer des sats</span>
+      <button onclick="closePay()" style="background:none; border:none; color:var(--muted); font-size:22px; cursor:pointer; line-height:1;">×</button>
+    </div>
+    <div id="pay-to" style="font-size:13px; color:var(--muted); margin-bottom:16px;"></div>
+    <input id="pay-amount" type="number" placeholder="Montant en sats…" style="width:100%; padding:14px 16px; background:var(--bg3); border:1px solid var(--border); border-radius:var(--radius-sm); color:var(--text); font-family:var(--font-mono); font-size:18px; outline:none; margin-bottom:16px;">
+    <button onclick="submitPay()" style="width:100%; padding:14px; border-radius:var(--radius-sm); background:linear-gradient(135deg,var(--gold),var(--orange)); color:#0A0A0F; border:none; font-family:var(--font-body); font-size:16px; font-weight:700; cursor:pointer;">⚡ Envoyer</button>
+  </div>
+</div>
+
+<script>
+// ── Toast ──
+function showToast(msg, type='info') {
+  const c = document.getElementById('toast-container');
+  const t = document.createElement('div');
+  const colors = { info:'var(--purple)', success:'var(--teal)', warn:'var(--gold)', error:'var(--red)' };
+  t.style.cssText = `background:var(--bg3); border:1px solid ${colors[type]||colors.info}; color:var(--text); padding:12px 24px; border-radius:40px; font-size:14px; font-weight:500; pointer-events:auto; white-space:nowrap; font-family:var(--font-body); box-shadow:0 8px 30px rgba(0,0,0,0.4); transition:all 0.3s; opacity:0; transform:translateY(12px);`;
+  t.textContent = msg;
+  c.appendChild(t);
+  requestAnimationFrame(() => { t.style.opacity='1'; t.style.transform='translateY(0)'; });
+  setTimeout(() => { t.style.opacity='0'; t.style.transform='translateY(12px)'; setTimeout(()=>t.remove(), 300); }, 3000);
+}
+
+// ── Compose modal ──
+function openCompose() {
+  const m = document.getElementById('compose-modal');
+  m.style.display = 'flex';
+  setTimeout(() => document.getElementById('compose-text').focus(), 50);
+}
+function closeCompose() {
+  document.getElementById('compose-modal').style.display = 'none';
+}
+function submitPost() {
+  const txt = document.getElementById('compose-text').value.trim();
+  if (!txt) { showToast('Écrivez quelque chose !', 'warn'); return; }
+  closeCompose();
+  document.getElementById('compose-text').value = '';
+  showToast('✓ Post publié sur le réseau !', 'success');
+}
+document.getElementById('compose-modal').addEventListener('click', function(e) {
+  if (e.target === this) closeCompose();
+});
+
+// ── Pay modal ──
+function openPay(target) {
+  const m = document.getElementById('pay-modal');
+  document.getElementById('pay-to').textContent = target ? 'Destinataire : ' + target : '';
+  document.getElementById('pay-amount').value = '';
+  m.style.display = 'flex';
+  setTimeout(() => document.getElementById('pay-amount').focus(), 50);
+}
+function closePay() {
+  document.getElementById('pay-modal').style.display = 'none';
+}
+function submitPay() {
+  const amt = document.getElementById('pay-amount').value;
+  if (!amt || amt <= 0) { showToast('Entrez un montant valide', 'warn'); return; }
+  closePay();
+  showToast(`⚡ ${parseInt(amt).toLocaleString()} sats envoyés !`, 'success');
+}
+document.getElementById('pay-modal').addEventListener('click', function(e) {
+  if (e.target === this) closePay();
+});
+
+// ── Post btn (compose area) ──
+document.querySelectorAll('.post-btn').forEach(btn => {
+  btn.addEventListener('click', function() {
+    const ta = this.closest('.compose-input-wrap')?.querySelector('.compose-input');
+    if (ta && ta.value.trim()) {
+      showToast('✓ Post publié sur le réseau !', 'success');
+      ta.value = '';
+    } else {
+      openCompose();
+    }
+  });
+});
+
+// ── Pay buttons (⚡ Payer dans les posts) ──
+document.querySelectorAll('.action-btn.send').forEach(btn => {
+  btn.addEventListener('click', function() {
+    const card = this.closest('.post-card');
+    const user = card?.querySelector('.post-username')?.textContent?.trim()?.split('\n')[0];
+    openPay(user);
+  });
+});
+
+// ── Copy buttons ──
+document.querySelectorAll('[onclick*="Copié"]').forEach(btn => {
+  btn.onclick = function() {
+    this.textContent = '✓ Copié !';
+    showToast('Adresse copiée dans le presse-papier', 'success');
+    setTimeout(() => this.textContent = 'Copier', 2000);
+    return false;
+  };
+});
+
+// ── Compose tools (emoji in compose area) ──
+document.querySelectorAll('.compose-tool').forEach(btn => {
+  btn.addEventListener('click', function() {
+    const labels = { '🖼️':'Ajout de média bientôt disponible', '⚡':'Paiement direct en sats', '🔐':'Chiffrement de bout en bout activé', '🏷️':'Ajouter un tag' };
+    showToast(labels[this.textContent] || 'Bientôt disponible', 'info');
+  });
+});
+
+// ── Feed tabs ──
+document.querySelectorAll('.feed-tab').forEach(tab => {
+  tab.addEventListener('click', function() {
+    document.querySelectorAll('.feed-tab').forEach(t => t.classList.remove('active'));
+    this.classList.add('active');
+    showToast('Fil « ' + this.textContent.trim() + ' » chargé', 'info');
+  });
+});
+
+// ── Keyboard shortcut ──
+document.addEventListener('keydown', e => {
+  if ((e.metaKey || e.ctrlKey) && e.key === 'k') { e.preventDefault(); openCompose(); }
+  if (e.key === 'Escape') { closeCompose(); closePay(); }
+});
+</script>
 </body>
 </html>

@@ -236,9 +236,9 @@
     <div class="wallet-balance">12 450</div>
     <div class="wallet-balance-eur">≈ 5,23 € · 0,000124 BTC</div>
     <div class="wallet-actions">
-      <button class="wallet-action-btn send">⚡ Envoyer des sats</button>
-      <button class="wallet-action-btn receive">📥 Recevoir</button>
-      <button class="wallet-action-btn receive">🔄 Historique</button>
+      <button class="wallet-action-btn send" onclick="openPay(null)">⚡ Envoyer des sats</button>
+      <button class="wallet-action-btn receive" onclick="showToast('Partagez votre adresse Bitcoin pour recevoir des sats', 'info')">📥 Recevoir</button>
+      <button class="wallet-action-btn receive" onclick="showToast('Historique complet bientôt disponible', 'info')">🔄 Historique</button>
     </div>
   </div>
 
@@ -247,7 +247,7 @@
     <div class="wallet-card">
       <div class="wallet-card-title">Adresse Bitcoin</div>
       <div class="addr-display">1A2B3C4D5E6F7G8H9I0JKLMNOPQRSTUVWXYZabc</div>
-      <button class="copy-addr-btn" onclick="this.textContent='✓ Copié dans le presse-papier'">📋 Copier l'adresse</button>
+      <button class="copy-addr-btn" onclick="showToast('Adresse copiée dans le presse-papier', 'success')">📋 Copier l'adresse</button>
     </div>
 
     <div class="wallet-card">
@@ -261,7 +261,7 @@
           <label class="form-label">Montant (sats)</label>
           <input class="form-input" type="number" placeholder="100">
         </div>
-        <button class="send-btn">⚡ Envoyer</button>
+        <button class="send-btn" onclick="submitWalletPay()">⚡ Envoyer</button>
       </div>
     </div>
   </div>
@@ -313,4 +313,16 @@
   </div>
 
 </div>
+{% endblock %}
+
+{% block extra_script %}
+function submitWalletPay() {
+  const dst = document.querySelector('.wallet-layout .form-input[type=text]').value.trim();
+  const amt = document.querySelector('.wallet-layout .form-input[type=number]').value;
+  if (!dst) { showToast('Entrez un destinataire', 'warn'); return; }
+  if (!amt || amt <= 0) { showToast('Entrez un montant valide', 'warn'); return; }
+  showToast('⚡ ' + parseInt(amt).toLocaleString() + ' sats envoyés à ' + dst + ' !', 'success');
+  document.querySelector('.wallet-layout .form-input[type=text]').value = '';
+  document.querySelector('.wallet-layout .form-input[type=number]').value = '';
+}
 {% endblock %}

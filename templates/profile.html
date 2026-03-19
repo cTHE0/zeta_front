@@ -205,7 +205,7 @@
   </div>
 
   <!-- Posts -->
-  <div id="tab-posts">
+  <div id="tab-posts" style="display:block;">
     {% for post in posts %}
     <div class="post-card" style="padding: 20px 24px; border-bottom: 1px solid var(--border);">
       <div class="post-content" style="font-size:15px; line-height:1.65; margin-bottom:12px;">
@@ -262,13 +262,34 @@
 
 {% block extra_script %}
 const tabs = document.querySelectorAll('.profile-tab');
+const tabIds = ['tab-posts', null, 'tab-identity', null];
+
 tabs.forEach((tab, i) => {
   tab.addEventListener('click', function() {
     tabs.forEach(t => t.classList.remove('active'));
     this.classList.add('active');
-    // Toggle content
-    document.getElementById('tab-posts').style.display = (i === 0) ? 'block' : 'none';
-    document.getElementById('tab-identity').style.display = (i === 2) ? 'block' : 'none';
+    document.getElementById('tab-posts').style.display = 'none';
+    document.getElementById('tab-identity').style.display = 'none';
+    if (tabIds[i]) {
+      document.getElementById(tabIds[i]).style.display = 'block';
+    } else if (i === 1) {
+      document.getElementById('tab-posts').style.display = 'block';
+      showToast('Aucune réponse pour le moment', 'info');
+    } else if (i === 3) {
+      window.location.href = '/wallet';
+    }
+  });
+});
+
+// Edit button
+document.querySelector('.profile-edit-btn').addEventListener('click', function() {
+  showToast('Édition du profil bientôt disponible', 'info');
+});
+
+// Profile stats click
+document.querySelectorAll('.profile-stat').forEach(stat => {
+  stat.addEventListener('click', function() {
+    showToast(this.textContent.trim(), 'info');
   });
 });
 {% endblock %}

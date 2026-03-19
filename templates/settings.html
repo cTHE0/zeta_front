@@ -1,0 +1,217 @@
+{% extends "base.html" %}
+{% block extra_style %}
+.settings-layout {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: calc(var(--nav-h) + 32px) 24px 60px;
+}
+.settings-section {
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+  margin-bottom: 24px;
+}
+.settings-section-title {
+  padding: 16px 20px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--muted);
+  border-bottom: 1px solid var(--border);
+  background: var(--bg2);
+}
+.settings-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--border);
+  gap: 16px;
+}
+.settings-row:last-child { border-bottom: none; }
+.settings-label { font-size: 14px; font-weight: 500; }
+.settings-sub { font-size: 12px; color: var(--muted); margin-top: 2px; }
+.toggle {
+  width: 44px; height: 24px;
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  cursor: pointer;
+  position: relative;
+  transition: background 0.2s;
+  flex-shrink: 0;
+}
+.toggle.on { background: var(--teal); border-color: var(--teal); }
+.toggle::after {
+  content: '';
+  position: absolute;
+  width: 18px; height: 18px;
+  border-radius: 50%;
+  background: white;
+  top: 2px; left: 2px;
+  transition: transform 0.2s;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.3);
+}
+.toggle.on::after { transform: translateX(20px); }
+.settings-select {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 7px 12px;
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: 13px;
+  outline: none;
+  cursor: pointer;
+}
+.danger-btn {
+  padding: 9px 20px;
+  border-radius: 20px;
+  border: 1px solid var(--red);
+  background: none;
+  color: var(--red);
+  font-family: var(--font-body);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.danger-btn:hover { background: var(--red); color: white; }
+{% endblock %}
+
+{% block body %}
+<div class="settings-layout">
+  <h1 style="font-family:var(--font-display); font-size:28px; font-weight:800; margin-bottom:32px;">Paramètres</h1>
+
+  <div class="settings-section">
+    <div class="settings-section-title">Identité & Nœud</div>
+    <div class="settings-row">
+      <div>
+        <div class="settings-label">Peer ID</div>
+        <div class="settings-sub" style="font-family:var(--font-mono); color:var(--text);">alice_phantom</div>
+      </div>
+      <button onclick="showToast('Peer ID non modifiable (lié à votre clé)', 'warn')" style="padding:7px 16px; border-radius:20px; border:1px solid var(--border); background:none; color:var(--muted); font-size:12px; cursor:pointer; font-family:var(--font-body);">Verrouillé 🔒</button>
+    </div>
+    <div class="settings-row">
+      <div>
+        <div class="settings-label">Fingerprint</div>
+        <div class="settings-sub" style="font-family:var(--font-mono); color:var(--teal);">f44c9b01e3a9d2c8</div>
+      </div>
+      <button onclick="showToast('Fingerprint copié !', 'success')" style="padding:7px 16px; border-radius:20px; border:1px solid var(--border); background:none; color:var(--muted); font-size:12px; cursor:pointer; font-family:var(--font-body);">Copier</button>
+    </div>
+    <div class="settings-row">
+      <div>
+        <div class="settings-label">Régénérer l'identité</div>
+        <div class="settings-sub">Crée une nouvelle clé ed25519 (irréversible)</div>
+      </div>
+      <button class="danger-btn" onclick="showToast('Régénération annulée — opération irréversible', 'warn')">Régénérer</button>
+    </div>
+  </div>
+
+  <div class="settings-section">
+    <div class="settings-section-title">Réseau P2P</div>
+    <div class="settings-row">
+      <div>
+        <div class="settings-label">Relay automatique</div>
+        <div class="settings-sub">Se reconnecter aux relays après déconnexion</div>
+      </div>
+      <div class="toggle on" onclick="toggle(this)"></div>
+    </div>
+    <div class="settings-row">
+      <div>
+        <div class="settings-label">Mode relay</div>
+        <div class="settings-sub">Partager votre nœud comme relay public</div>
+      </div>
+      <div class="toggle" onclick="toggle(this)"></div>
+    </div>
+    <div class="settings-row">
+      <div>
+        <div class="settings-label">TTL par défaut</div>
+        <div class="settings-sub">Nombre de sauts maximum par message</div>
+      </div>
+      <select class="settings-select" onchange="showToast('TTL mis à jour : ' + this.value + ' sauts', 'success')">
+        <option>8</option>
+        <option selected>16</option>
+        <option>32</option>
+      </select>
+    </div>
+    <div class="settings-row">
+      <div>
+        <div class="settings-label">Port UDP</div>
+        <div class="settings-sub">Port d'écoute local</div>
+      </div>
+      <input type="number" value="54321" style="width:90px; padding:7px 12px; background:var(--bg2); border:1px solid var(--border); border-radius:8px; color:var(--text); font-family:var(--font-mono); font-size:13px; outline:none;" onchange="showToast('Port mis à jour', 'success')">
+    </div>
+  </div>
+
+  <div class="settings-section">
+    <div class="settings-section-title">Confidentialité</div>
+    <div class="settings-row">
+      <div>
+        <div class="settings-label">Chiffrement E2E</div>
+        <div class="settings-sub">Messages chiffrés de bout en bout</div>
+      </div>
+      <div class="toggle on" onclick="showToast('Le chiffrement E2E ne peut pas être désactivé 🔐', 'warn')"></div>
+    </div>
+    <div class="settings-row">
+      <div>
+        <div class="settings-label">Afficher mon adresse Bitcoin</div>
+        <div class="settings-sub">Visible sur votre profil public</div>
+      </div>
+      <div class="toggle on" onclick="toggle(this)"></div>
+    </div>
+    <div class="settings-row">
+      <div>
+        <div class="settings-label">Historique des messages</div>
+        <div class="settings-sub">Conserver les messages localement</div>
+      </div>
+      <div class="toggle on" onclick="toggle(this)"></div>
+    </div>
+  </div>
+
+  <div class="settings-section">
+    <div class="settings-section-title">Notifications</div>
+    <div class="settings-row">
+      <div><div class="settings-label">Nouveaux messages</div></div>
+      <div class="toggle on" onclick="toggle(this)"></div>
+    </div>
+    <div class="settings-row">
+      <div><div class="settings-label">Paiements reçus</div></div>
+      <div class="toggle on" onclick="toggle(this)"></div>
+    </div>
+    <div class="settings-row">
+      <div><div class="settings-label">Nouveaux abonnés</div></div>
+      <div class="toggle" onclick="toggle(this)"></div>
+    </div>
+  </div>
+
+  <div class="settings-section">
+    <div class="settings-section-title">Danger</div>
+    <div class="settings-row">
+      <div>
+        <div class="settings-label">Effacer les données locales</div>
+        <div class="settings-sub">Supprime le cache messages et les préférences</div>
+      </div>
+      <button class="danger-btn" onclick="showToast('Données locales effacées', 'warn')">Effacer</button>
+    </div>
+    <div class="settings-row">
+      <div>
+        <div class="settings-label" style="color:var(--red);">Supprimer le compte</div>
+        <div class="settings-sub">Retire votre nœud du réseau (irréversible)</div>
+      </div>
+      <button class="danger-btn" onclick="showToast('Action annulée — contactez le support', 'error')">Supprimer</button>
+    </div>
+  </div>
+
+</div>
+{% endblock %}
+
+{% block extra_script %}
+function toggle(el) {
+  el.classList.toggle('on');
+  const label = el.closest('.settings-row').querySelector('.settings-label').textContent;
+  showToast((el.classList.contains('on') ? '✓ Activé : ' : '✗ Désactivé : ') + label, 'success');
+}
+{% endblock %}

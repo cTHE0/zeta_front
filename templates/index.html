@@ -15,11 +15,11 @@
         <li><a href="/explore">
           <span class="menu-icon">🔍</span> Explorer
         </a></li>
-        <li><a href="#">
+        <li><a href="/notifications">
           <span class="menu-icon">🔔</span> Notifications
           <span class="badge">3</span>
         </a></li>
-        <li><a href="#">
+        <li><a href="/messages">
           <span class="menu-icon">💬</span> Messages
           <span class="badge">7</span>
         </a></li>
@@ -32,13 +32,13 @@
         <li><a href="/profile">
           <span class="menu-icon">👤</span> Profil
         </a></li>
-        <li><a href="#">
+        <li><a href="/settings">
           <span class="menu-icon">⚙️</span> Paramètres
         </a></li>
       </ul>
     </div>
 
-    <a href="#" class="compose-btn">
+    <a href="#compose-modal" class="compose-btn" onclick="openCompose(); return false;">
       <span>✦</span> Nouveau post
     </a>
 
@@ -223,7 +223,7 @@
       <div style="display:flex; align-items:center; gap:8px; padding: 8px 12px; background: rgba(247,183,49,0.08); border-radius: 10px; margin-bottom: 12px; border: 1px solid rgba(247,183,49,0.2);">
         <span style="font-size:14px;">₿</span>
         <span style="font-family: var(--font-mono); font-size: 11px; color: var(--gold);">{{ post.btc[:16] }}…</span>
-        <button style="margin-left:auto; padding: 4px 12px; border-radius: 20px; border: 1px solid var(--gold); background: none; color: var(--gold); font-size: 11px; font-weight: 600; cursor: pointer; font-family: var(--font-body);" onclick="this.textContent='✓ Copié!'">Copier</button>
+        <button style="margin-left:auto; padding: 4px 12px; border-radius: 20px; border: 1px solid var(--gold); background: none; color: var(--gold); font-size: 11px; font-weight: 600; cursor: pointer; font-family: var(--font-body);" onclick="copyBtc(this, '{{ post.btc }}')">Copier</button>
       </div>
       {% endif %}
 
@@ -317,9 +317,9 @@
     </div>
 
     <div style="font-size:11px; color: var(--muted); line-height: 1.8; padding: 0 4px;">
-      <a href="#" style="color:inherit; text-decoration:none;">À propos</a> · 
-      <a href="#" style="color:inherit; text-decoration:none;">Confidentialité</a> · 
-      <a href="#" style="color:inherit; text-decoration:none;">Open Source</a><br>
+      <a href="#" onclick="showToast('À propos — bientôt disponible', 'info'); return false;" style="color:inherit; text-decoration:none;">À propos</a> · 
+      <a href="#" onclick="showToast('Réseau décentralisé — aucune donnée centralisée 🔐', 'success'); return false;" style="color:inherit; text-decoration:none;">Confidentialité</a> · 
+      <a href="#" onclick="showToast('Code source bientôt sur GitHub', 'info'); return false;" style="color:inherit; text-decoration:none;">Open Source</a><br>
       Zeta Network v0.1.0 — Réseau P2P décentralisé
     </div>
   </aside>
@@ -329,26 +329,56 @@
 {% endblock %}
 
 {% block extra_script %}
-// Tab switching
-document.querySelectorAll('.feed-tab').forEach(tab => {
-  tab.addEventListener('click', function() {
-    document.querySelectorAll('.feed-tab').forEach(t => t.classList.remove('active'));
-    this.classList.add('active');
-  });
-});
-
-// Follow button toggle
+// Follow button toggle (sidebar suggestions)
 document.querySelectorAll('.follow-btn').forEach(btn => {
   btn.addEventListener('click', function() {
-    if (this.textContent === 'Suivre') {
+    if (this.textContent.trim() === 'Suivre') {
       this.textContent = 'Suivi ✓';
       this.style.background = 'var(--red)';
       this.style.color = 'white';
+      showToast('Abonnement ajouté !', 'success');
     } else {
       this.textContent = 'Suivre';
       this.style.background = '';
       this.style.color = '';
+      showToast('Abonnement retiré', 'info');
     }
+  });
+});
+
+// Charger plus
+document.querySelector('.feed button') && document.querySelector('.feed button').addEventListener('click', function() {
+  this.textContent = '⟳ Chargement…';
+  setTimeout(() => {
+    this.textContent = '✓ Tout est à jour';
+    this.disabled = true;
+    this.style.opacity = '0.5';
+    showToast('Fil mis à jour', 'success');
+  }, 1200);
+});
+
+// Story click
+document.querySelectorAll('.story-item').forEach(story => {
+  story.addEventListener('click', function() {
+    const name = this.querySelector('.story-name').textContent;
+    if (name === 'vous') {
+      showToast('Ajouter une story — bientôt disponible', 'info');
+    } else {
+      showToast('Story de ' + name + ' — bientôt disponible', 'info');
+    }
+  });
+});
+
+// Compose tools
+document.querySelectorAll('.compose-tool').forEach(btn => {
+  btn.addEventListener('click', function() {
+    const labels = {
+      '🖼️': 'Ajout de média — bientôt disponible',
+      '⚡': 'Glissez des sats dans votre message',
+      '🔐': 'Chiffrement E2E activé par défaut',
+      '🏷️': 'Tagger un pair — bientôt disponible'
+    };
+    showToast(labels[this.textContent.trim()] || 'Bientôt disponible', 'info');
   });
 });
 {% endblock %}

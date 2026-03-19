@@ -55,4 +55,3 @@ p2p_social/
 - Thème : Dark avec accents Rouge/Violet/Teal/Or
 - Inspiré des apps sociales chinoises (addictivité, flux, stories)
 - 100% CSS + JS vanilla, aucune dépendance frontend
-# zeta_front

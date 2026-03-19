@@ -225,6 +225,19 @@
 {% endblock %}
 
 {% block extra_script %}
+document.querySelectorAll('.see-all').forEach(link => {
+  link.addEventListener('click', function() {
+    showToast('Affichage complet bientôt disponible', 'info');
+  });
+});
+
+document.querySelectorAll('.trending-pill').forEach(pill => {
+  pill.addEventListener('click', function() {
+    const tag = this.querySelector('.pill-tag').textContent;
+    showToast('Recherche : ' + tag, 'info');
+  });
+});
+
 document.querySelectorAll('.follow-btn, .person-card button').forEach(btn => {
   btn.addEventListener('click', function(e) {
     e.stopPropagation();
@@ -232,10 +245,12 @@ document.querySelectorAll('.follow-btn, .person-card button').forEach(btn => {
       this.textContent = '✓ Suivi';
       this.style.background = 'var(--red)';
       this.style.color = 'white';
+      showToast('Abonnement ajouté !', 'success');
     } else {
       this.textContent = 'Suivre';
       this.style.background = '';
       this.style.color = 'var(--red)';
+      showToast('Abonnement retiré', 'info');
     }
   });
 });
